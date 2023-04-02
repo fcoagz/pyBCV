@@ -24,7 +24,7 @@ bcv = pyBCV.Currency()
 
 print(bcv.get_rate())
 
->> {}
+>> {'EUR': 'Bs. 26.65', 'CNY': 'Bs. 3.57', 'TRY': 'Bs. 1.28', 'RUB': 'Bs. 0.32', 'USD': 'Bs. 24.53'}
 ```
 Retorna una estructura JSON.
 
@@ -36,5 +36,5 @@ bcv = pyBCV.Currency()
 
 print(bcv.get_rate('USD'))
 
->> Bs. 25.92
+>> 'Bs. 24.53'
 ```
