@@ -31,5 +31,3 @@ class Currency:
 
             elif currency_code in rates:
                 return rates[currency_code]
-              
-print(Currency().get_rate('USD'))
