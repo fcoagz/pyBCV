@@ -5,12 +5,12 @@ HERE = pathlib.Path(__file__).parent
 
 VERSION = '1.0.0'
 PACKAGE_NAME = 'pyBCV' 
-AUTHOR = 'Francisco Griman, Adrián'
+AUTHOR = 'Francisco Griman'
 AUTHOR_EMAIL = 'grihardware@gmail.com'
 URL = 'https://github.com/fcoagz/pyBCV'
 
 LICENSE = 'MIT'
-DESCRIPTION = 'PyBCV es una librería desarrollada en el lenguaje de programación Python que se utiliza para recopilar los precios de los tipos de cambio proporcionados por el Banco Central de Venezuela (BCV).'
+DESCRIPTION = 'PyBCV es una librería desarrollada en el lenguaje de programación Python que se utiliza para recopilar los precios de los tipos de cambio y las tasas informativas proporcionados por el Banco Central de Venezuela (BCV).'
 LONG_DESCRIPTION = (HERE / "README.md").read_text(encoding='utf-8')
 LONG_DESC_TYPE = "text/markdown"
 

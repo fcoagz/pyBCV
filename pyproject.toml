@@ -2,10 +2,9 @@
 name = "pyBCV"
 version = "1.0.0"
 authors = [
-  { name="Francisco Griman", email="grihardware@gmail.com" },
-  { name="", email=""}
+  { name="Francisco Griman", email="grihardware@gmail.com" }
 ]
-description = "PyBCV es una librería desarrollada en el lenguaje de programación Python que se utiliza para recopilar los precios de los tipos de cambio proporcionados por el Banco Central de Venezuela (BCV)."
+description = "PyBCV es una librería desarrollada en el lenguaje de programación Python que se utiliza para recopilar los precios de los tipos de cambio y las tasas informativas proporcionados por el Banco Central de Venezuela (BCV)."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
