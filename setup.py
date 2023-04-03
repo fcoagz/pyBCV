@@ -16,7 +16,8 @@ LONG_DESC_TYPE = "text/markdown"
 
 INSTALL_REQUIRES = [
       'requests',
-      'bs4'
+      'bs4',
+      'beautifulsoup4'
       ]
 
 CLASSIFIERS = [

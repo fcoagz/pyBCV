@@ -15,7 +15,8 @@ classifiers = [
 keywords = ["bcv","analysis","precios","tasascambio","divisas","pybcv","venezuela"]
 dependencies = [
   "requests",
-  "bs4"
+  "bs4",
+  "beautifulsoup4"
 ]
 
 [project.urls]
