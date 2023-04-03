@@ -12,13 +12,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
-keywords = [
-    "BCV",
-    "dolar",
-    "euro",
-    "Venezuela",
-
-]
+keywords = ["bcv","analysis","precios","tasascambio","divisas","pybcv","venezuela"]
 dependencies = [
   "requests",
   "bs4"
