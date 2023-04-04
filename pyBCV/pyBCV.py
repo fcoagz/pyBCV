@@ -12,18 +12,24 @@ class Currency:
             dataWeb = BeautifulSoup(webResult.content, 'html.parser')
 
             label_html = dataWeb.find_all('div', 'col-sm-12 col-xs-12')
+            label_html_date = dataWeb.find('div', 'pull-right dinpro center')
             priceResult = []
+            dateValid = []
 
             for i in label_html:
                 x = i.find('strong')
                 priceResult.append(x.text.strip().replace(',', '.'))
+            
+            for z in label_html_date:
+                dateValid.append(z.text.strip())
 
             rates = {
                 'EUR' : f'Bs. {round(float(priceResult[-5]), 2)}',
                 'CNY' : f'Bs. {round(float(priceResult[-4]), 2)}',
                 'TRY' : f'Bs. {round(float(priceResult[-3]), 2)}',
                 'RUB' : f'Bs. {round(float(priceResult[-2]), 2)}',
-                'USD' : f'Bs. {round(float(priceResult[-1]), 2)}'
+                'USD' : f'Bs. {round(float(priceResult[-1]), 2)}',
+                'DATE' : f'{dateValid[0]} {dateValid[1]}'
             }
 
             if not currency_code:
