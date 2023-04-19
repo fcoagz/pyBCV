@@ -8,11 +8,11 @@ PyBCV es una librería desarrollada en el lenguaje de programación Python que s
 ## Instalación
 Para instalar esta librería, puedes utilizar el siguiente comando de pip:
 ```py
-pip install pyBCV
+pip install --upgrade pyBCV
 ```
 Si usas un Sistema Operativo como Linux o Mac:
 ```py
-pip3 install pyBCV
+pip3 install --upgrade pyBCV
 ```
 
 ## Uso
