@@ -73,7 +73,7 @@ class Currency:
         self.loaded = True
         self.last_request_timestamp = datetime.now()
 
-    def _pretty_rates(self):
+    def _pretty_rates(self) -> dict[str, str]:
         return {
             k: (f"Bs {value}" if k != "Fecha" else value.isoformat())
             for k, value in self.rates.items()
@@ -81,7 +81,7 @@ class Currency:
 
     def get_rate(
         self, currency_code: str = None, prettify: bool = False
-    ) -> dict[str, str] | str:
+    ) -> dict[str, str] | str | dict[str, float] | float:
         """
         El módulo `get_rate()` acepta un código de moneda como argumento y devuelve
         la tasa de cambio actual de esa moneda.
