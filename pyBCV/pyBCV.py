@@ -6,7 +6,21 @@ from bs4 import BeautifulSoup
 requests.packages.urllib3.disable_warnings()
 
 class Currency:
+    """
+    `pyBCV.Currency()`. Es la instancia principal para obtener los datos de tipo de cambio del BCV.\n
+    https://github.com/fcoagz/pyBCV#uso
+
+    ```py
+    import pyBCV
+
+    bcv = pyBCV.Currency()
+    bcv.get_rate(currency_code='USD')
+    ```
+    """
     def get_rate(self, currency_code=None) -> dict[str, str] | str:
+        """
+        El módulo `get_rate()` acepta un código de moneda como argumento y devuelve la tasa de cambio actual de esa moneda.
+        """
         response = requests.get('https://www.bcv.org.ve/', verify=False)
 
         if response.status_code == requests.codes.ok:
@@ -36,7 +50,21 @@ class Currency:
                 return rates[currency_code]
     
 class Bank:
+    """
+    `pyBCV.Bank()`. Es la segunda instancia para obtener los datos del sistema bancario del BCV.\n
+    https://github.com/fcoagz/pyBCV#uso
+
+    ```py
+    import pyBCV
+
+    bcv = pyBCV.Bank()
+    bcv.get_by_bank(bank_code='Banesco', rate_or_sale='Compra')
+    ```
+    """
     def get_by_bank(self, bank_code=None, rate_or_sale=None) -> dict[Any, dict[str, str]] | str | dict[str, str]:
+        """
+        El módulo `get_by_bank()` acepta el nombre de un banco como argumento y devuelve la fecha vigente y el sistema cambiario de compra y venta de moneda extranjera para ese banco.
+        """
         response = requests.get('https://www.bcv.org.ve/tasas-informativas-sistema-bancario', verify=False)
 
         if response.status_code == requests.codes.ok:
