@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 from bs4 import BeautifulSoup
 
-from .core.requests import BCVRequests
+from pyBCV.core.requests import BCVRequests
 
 def _extract_timestamp(soup: BeautifulSoup) -> datetime:
     try:
