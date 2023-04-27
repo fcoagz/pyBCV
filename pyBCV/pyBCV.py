@@ -1,8 +1,11 @@
+import locale
+from decimal import Decimal
 from typing import Any, Callable
 from datetime import datetime, timedelta
-from .requests import BCVRequests
+
 from bs4 import BeautifulSoup
 
+from .core.requests import BCVRequests
 
 def _extract_timestamp(soup: BeautifulSoup) -> datetime:
     try:
@@ -12,11 +15,26 @@ def _extract_timestamp(soup: BeautifulSoup) -> datetime:
     except:
         return None
 
+def _formatted_date(soup: BeautifulSoup) -> str:
+    locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')
+    current_date = _extract_timestamp(soup)
+    day_weekday = current_date.weekday()
 
-def _get_rate_by_id(tag_id: str, soup: BeautifulSoup) -> float:
+    day_name = (
+        'Lunes' if day_weekday == 0 else
+        'Martes' if day_weekday == 1 else
+        'Miercoles' if day_weekday == 2 else
+        'Jueves' if day_weekday == 3 else
+        'Viernes'
+    )
+
+    if current_date is not None:
+        return current_date.strftime(f'{day_name}, %d %B del %Y')
+
+def _get_rate_by_id(tag_id: str, soup: BeautifulSoup) -> Decimal:
     try:
         rate_value = soup.find(id=tag_id).find("strong").text.strip().replace(",", ".")
-        rate_value = float(rate_value)
+        rate_value = Decimal(rate_value)
     except:
         rate_value = None
 
@@ -68,7 +86,7 @@ class Currency:
             "TRY": _get_rate_by_id("lira", section_tipo_de_cambio_oficial),
             "RUB": _get_rate_by_id("rublo", section_tipo_de_cambio_oficial),
             "USD": _get_rate_by_id("dolar", section_tipo_de_cambio_oficial),
-            "Fecha": _extract_timestamp(section_tipo_de_cambio_oficial),
+            "Fecha": [_extract_timestamp(section_tipo_de_cambio_oficial), _formatted_date(section_tipo_de_cambio_oficial)]
         }
         self.loaded = True
         self.last_request_timestamp = datetime.now()
@@ -80,7 +98,7 @@ class Currency:
         }
 
     def get_rate(
-        self, currency_code: str = None, prettify: bool = False
+        self, currency_code: str = None, prettify: bool = False, date_format: bool = True
     ) -> dict[str, str] | str | dict[str, float] | float:
         """
         El módulo `get_rate()` acepta un código de moneda como argumento y devuelve
@@ -92,6 +110,9 @@ class Currency:
             or (datetime.now() - self.last_request_timestamp) >= self.refresh_period
         ):
             self._load()
+
+        if currency_code == 'Fecha':
+            return self.rates[currency_code][0] if not date_format else self.rates[currency_code][1]
 
         if not currency_code:
             return self.rates if not prettify else self._pretty_rates()
