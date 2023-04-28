@@ -1,6 +1,6 @@
 [project]
 name = "pyBCV"
-version = "1.0.6"
+version = "1.0.7"
 authors = [
   { name="Francisco Griman", email="grihardware@gmail.com" }
 ]
