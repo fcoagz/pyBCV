@@ -1,84 +1,47 @@
-import locale
-from decimal import Decimal
-from typing import Any, Callable
-from datetime import datetime, timedelta
-
 from bs4 import BeautifulSoup
 
-from pyBCV.core.requests import BCVRequests
+from pyBCV.requests import get_content_page
+from pyBCV.util import (
+    TASAS_INFORMATIVAS_URL,
+    PAGINA_PRINCIPAL_URL
+)
 
-def _extract_timestamp(soup: BeautifulSoup) -> datetime:
-    try:
-        return datetime.fromisoformat(
-            soup.find("span", "date-display-single").get("content")
-        )
-    except:
-        return None
+def _get_rate_by_id(tag_id: str, soup: BeautifulSoup):
+    return soup.find(id=tag_id).find("strong").text.strip().replace(',', '.')
 
-def _formatted_date(soup: BeautifulSoup) -> str:
-    locale.setlocale(locale.LC_TIME, 'es_MX.UTF-8')
-    current_date = _extract_timestamp(soup)
-    day_weekday = current_date.weekday()
+def _get_time(soup: BeautifulSoup):
+    return soup.find("span", "date-display-single").text.strip()
 
-    day_name = (
-        'Lunes' if day_weekday == 0 else
-        'Martes' if day_weekday == 1 else
-        'Miercoles' if day_weekday == 2 else
-        'Jueves' if day_weekday == 3 else
-        'Viernes'
-    )
+def _get_rates_with_for(soup: BeautifulSoup, name: str = "td", attrs: str = None):
+    return [str(x.text).strip() for x in soup.find_all(name, attrs)]
 
-    if current_date is not None:
-        return current_date.strftime(f'{day_name}, %d %B del %Y')
-
-def _get_rate_by_id(tag_id: str, soup: BeautifulSoup) -> Decimal:
-    try:
-        rate_value = soup.find(id=tag_id).find("strong").text.strip().replace(",", ".")
-        rate_value = Decimal(rate_value)
-    except:
-        rate_value = None
-
-    return rate_value
-
-
-class Currency:
+class Currency(object):
     """
-    `pyBCV.Currency()`. Es la instancia principal para obtener los datos de tipo de cambio del BCV.\n
-    https://github.com/fcoagz/pyBCV#uso
-
-    ```py
+    La clase Currency se utiliza para obtener los precios de los tipos de cambio \
+    proporcionados por el Banco Central de Venezuela (BCV). \n
+    - El método _load se encarga de obtener los datos de la página web y almacenarlos en el diccionario self.rates. \n
+    - El método get_rate se utiliza para obtener los datos almacenados en el diccionario self.rates. Si se proporciona un código de moneda, devolverá el valor correspondiente para esa moneda. \n\n
+    ```python
     import pyBCV
 
-    bcv = pyBCV.Currency()
-    bcv.get_rate(currency_code='USD')
+    currency = pyBCV.Currency()
+
+    # Obtener todos los datos almacenados en el diccionario
+    all_rates = currency.get_rate()
+    print(all_rates)
+
+    # Obtener el tipo de cambio para USD sin símbolo de moneda
+    usd_rate = currency.get_rate(currency_code='USD', prettify=False)
+    print(usd_rate)
+
+    # Obtener la fecha de la última actualización
+    last_update = currency.get_rate(currency_code='Fecha')
+    print(last_update)
     ```
     """
-
-    def __init__(
-        self,
-        refresh_period: timedelta = timedelta(hours=1),
-        lazy_load: bool = False,
-    ):
-        self.refresh_period = refresh_period
-        self.rates = {}
-        self.loaded = False
-        self.last_request_timestamp = None
-        self.lazy_load = lazy_load
-        if not self.lazy_load:
-            self._load()
-
-    def _load(self):
-        self.loaded = False
-        if (
-            self.last_request_timestamp
-            and (datetime.now() - self.last_request_timestamp) < self.refresh_period
-        ):
-            return
-
-        soup = BeautifulSoup(BCVRequests.get_main_page(), "html.parser")
-        section_tipo_de_cambio_oficial = soup.find(
-            "div", "view-tipo-de-cambio-oficial-del-bcv"
-        )
+    def _load(self) -> None:
+        soup = BeautifulSoup(get_content_page(PAGINA_PRINCIPAL_URL), "html.parser")
+        section_tipo_de_cambio_oficial = soup.find("div", "view-tipo-de-cambio-oficial-del-bcv")
 
         self.rates = {
             "EUR": _get_rate_by_id("euro", section_tipo_de_cambio_oficial),
@@ -86,110 +49,58 @@ class Currency:
             "TRY": _get_rate_by_id("lira", section_tipo_de_cambio_oficial),
             "RUB": _get_rate_by_id("rublo", section_tipo_de_cambio_oficial),
             "USD": _get_rate_by_id("dolar", section_tipo_de_cambio_oficial),
-            "Fecha": [_extract_timestamp(section_tipo_de_cambio_oficial), _formatted_date(section_tipo_de_cambio_oficial)]
-        }
-        self.loaded = True
-        self.last_request_timestamp = datetime.now()
-
-    def _pretty_rates(self) -> dict[str, str]:
-        return {
-            k: (f"Bs {value}" if k != "Fecha" else value.isoformat())
-            for k, value in self.rates.items()
+            "Fecha": _get_time(section_tipo_de_cambio_oficial)
         }
 
-    def get_rate(
-        self, currency_code: str = None, prettify: bool = False, date_format: bool = True
-    ) -> dict[str, str] | str | dict[str, float] | float:
-        """
-        El módulo `get_rate()` acepta un código de moneda como argumento y devuelve
-        la tasa de cambio actual de esa moneda.
-        """
-
-        if (
-            not self.last_request_timestamp
-            or (datetime.now() - self.last_request_timestamp) >= self.refresh_period
-        ):
-            self._load()
-
-        if currency_code == 'Fecha':
-            return self.rates[currency_code][0] if not date_format else self.rates[currency_code][1]
+    def get_rate(self, currency_code: str = None, prettify: bool = True):
+        self._load()
 
         if not currency_code:
-            return self.rates if not prettify else self._pretty_rates()
+            return self.rates
+        if currency_code not in self.rates:
+            raise KeyError("Does not match any of the properties that were provided in the dictionary. Most information: https://github.com/fcoagz/pyBCV")
+        
+        return (self.rates[currency_code] if currency_code == "Fecha" 
+                else f"Bs. {self.rates[currency_code]}" if prettify 
+                else self.rates[currency_code])
 
-        return (
-            self.rates[currency_code]
-            if not prettify
-            else f"Bs. {self.rates[currency_code]}"
-        )
-
-
-class Bank:
+class Bank(object):
     """
-    `pyBCV.Bank()`. Es la segunda instancia para obtener los datos del sistema bancario del BCV.\n
-    https://github.com/fcoagz/pyBCV#uso
-
+    La clase Bank en la librería pyBCV se utiliza para obtener información sobre los tipos de cambio de compra y venta de moneda extranjera \
+    para los bancos disponibles en el sistema bancario del Banco Central de Venezuela (BCV). \n
+    - La función _load de la clase Bank utiliza el módulo BeautifulSoup para extraer la información de las tasas informativas oficiales del BCV y almacenarla en un diccionario. \n
+    - El método get_by_bank se utiliza para obtener la información de compra y venta de moneda extranjera para un banco específico o para todos los bancos disponibles. \n\n
     ```py
     import pyBCV
 
     bcv = pyBCV.Bank()
-    bcv.get_by_bank(bank_code='Banesco', rate_or_sale='Compra')
+    bank_info = bcv.get_by_bank()
+    print(bank_info)
     ```
     """
+    def _load(self):
+        section_tasas_informativas_oficial = BeautifulSoup(get_content_page(TASAS_INFORMATIVAS_URL), "html.parser")
 
-    def get_by_bank(
-        self, bank_code=None, rate_or_sale=None
-    ) -> dict[Any, dict[str, str]] | str | dict[str, str]:
-        """
-        El módulo `get_by_bank()` acepta el nombre de un banco como argumento y devuelve la fecha vigente y el sistema cambiario de compra y venta de moneda extranjera para ese banco.
-        """
+        date_indicator = _get_rates_with_for(section_tasas_informativas_oficial, attrs = "views-field views-field-field-fecha-del-indicador")
+        title_bank = _get_rates_with_for(section_tasas_informativas_oficial, attrs = "views-field views-field-views-conditional")
+        rate_buys = _get_rates_with_for(section_tasas_informativas_oficial, attrs = "views-field views-field-field-tasa-compra")
+        rate_sales = _get_rates_with_for(section_tasas_informativas_oficial, attrs = "views-field views-field-field-tasa-venta")
 
-        soup = BeautifulSoup(BCVRequests.get_tasas_bancos(), "html.parser")
+        self.banks = {}
+        for i in range(10): # results: 10
+            bank = {
+                "Fecha": date_indicator[i],
+                "Compra": f"Bs. {rate_buys[i]}",
+                "Venta": f"Bs. {rate_sales[i]}",
+            }
+            self.banks[title_bank[i]] = bank
 
-        date_indicator = []
-        title_bank = []
-        rate_buys = []
-        rate_sales = []
-
-        for i in soup.find_all(
-            "td", "views-field views-field-field-fecha-del-indicador"
-        ):
-            date_indicator.append(i.text.strip())
-        for j in soup.find_all("td", "views-field views-field-views-conditional"):
-            title_bank.append(j.text.strip())
-        for k in soup.find_all("td", "views-field views-field-field-tasa-compra"):
-            rate_buys.append(k.text.strip().replace(",", "."))
-        for e in soup.find_all("td", "views-field views-field-field-tasa-venta"):
-            rate_sales.append(e.text.strip().replace(",", "."))
-
-        bank = {
-            title_bank[0]: {
-                "Fecha": date_indicator[0],
-                "Compra": f"Bs. {rate_buys[0]}",
-                "Venta": f"Bs. {rate_sales[0]}",
-            },
-            title_bank[1]: {
-                "Fecha": date_indicator[1],
-                "Compra": f"Bs. {rate_buys[1]}",
-                "Venta": f"Bs. {rate_sales[1]}",
-            },
-            title_bank[2]: {
-                "Fecha": date_indicator[2],
-                "Compra": f"Bs. {rate_buys[2]}",
-                "Venta": f"Bs. {rate_sales[2]}",
-            },
-            title_bank[3]: {
-                "Fecha": date_indicator[2],
-                "Compra": f"Bs. {rate_buys[2]}",
-                "Venta": f"Bs. {rate_sales[3]}",
-            },
-        }
+    def get_by_bank(self, bank_code=None, rate_or_sale=None):
+        self._load()
 
         if not bank_code:
-            return bank
-
-        elif rate_or_sale in bank[bank_code]:
-            return bank[bank_code][rate_or_sale]
-
-        elif bank_code in bank:
-            return bank[bank_code]
+            return self.banks
+        if bank_code not in self.banks:
+            raise KeyError("Does not match any of the properties that were provided in the dictionary. Most information: https://github.com/fcoagz/pyBCV")
+        
+        return self.banks[bank_code][rate_or_sale] if rate_or_sale in self.banks[bank_code] else self.banks[bank_code]
