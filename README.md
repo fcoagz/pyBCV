@@ -3,7 +3,7 @@
 </p>
 
 # pyBCV
-PyBCV es una librería desarrollada en el lenguaje de programación Python que se utiliza para recopilar los precios de los tipos de cambio y la tasas informativas del sistema bancario proporcionados por el Banco Central de Venezuela (BCV). Esta librería se centra específicamente en la obtención de los datos de tipos de cambio y las tasas informativas del BCV y los convierte en un formato fácilmente utilizable en Python.
+pyBCV es una librería de Python que simplifica la obtención de los precios de los tipos de cambio y las tasas informativas del sistema bancario proporcionados por el Banco Central de Venezuela (BCV) convirtiéndolos en un formato fácilmente utilizable en Python.
 
 ## Instalación
 Para instalar esta librería, puedes utilizar el siguiente comando:
@@ -15,42 +15,29 @@ Para actualizar esta librería, puedes utilizar el siguiente comando:
 pip install pyBCV --upgrade
 ```
 ## Uso
-La clase `pyBCV.Currency` tiene los siguiente métodos:
-- `refresh_period`: Inicializa la clase Currency con un período de actualización. Por defecto `timedelta = timedelta(hours=1)`.
-- `lazy_load`: Indicador de carga. Matendra la tasa de cambio guardado en cache si vuelve a preguntar por la tasa nuevamente. por defecto `bool = False`.
+La librería pyBCV proporciona dos clases, `Currency` y `Bank`, para obtener tasas de cambio e informativas de bancos del Banco Central de Venezuela.
 
-El método `pyBCV.Currency().get_rate()` tiene los siguiente parametros:
-- `currency_code`: Acepta un código de moneda o fecha como argumento.
-- `prettify`: Acepta un valor booleano si desea que el valor de la moneda salga junto con el simbolo de Bolivares. `Bs. [VALOR]`
-- `date_format`: Acepta un valor booleano si desea que la fecha extraiga la fecha y hora de la página web del Banco Central de Venezuela (BCV) o Formatea la fecha extraída en una cadena de texto legible. Por defecto `bool = True`. Extrae la fecha en una cadena de texto.
-
-### Ejemplo:
-```python
+La clase `Currency` obtiene tasas de cambio para varias monedas y las devuelve en formato de diccionario. También proporciona métodos para obtener una tasa de cambio específica o la hora de la última actualización.
+```py
 import pyBCV
 
-bcv = pyBCV.Currency(lazy_load=True)
-
-get_value_usd = bcv.get_rate(currency_code='USD')
-get_in_bs_eur = bcv.get_rate(currency_code='EUR', prettify=True)
-get_date_valid = bcv.get_rate(currency_code='Fecha', date_format=True)
+currency = pyBCV.Currency()
+all_rates = currency.get_rate() # obtener todas las tasas de cambio de moneda
+usd_rate = currency.get_rate(currency_code='USD', prettify=False) # obtener la tasa de cambio del dólar estadounidense sin símbolo de moneda
+last_update = currency.get_rate(currency_code='Fecha') # obtener la hora de la última actualización
 ```
-Para obtener una estructura tipo JSON de las monedas disponibles en pyBCV, utilizamos la función `pyBCV.Currency().get_rate()` sin argumentos, el cual devuelve un diccionario.
 
-La clase `pyBCV.Bank` tiene el siguiente método:
-- `pyBCV.Bank().get_by_bank()`: Devuelve el sistema cambiario de compra y venta de moneda extranjera para un banco específico o todos los bancos disponibles.
-### Ejemplo:
-```python
+La clase `Bank` obtiene tasas informativas proporcionadas por varios bancos en Venezuela y las devuelve en formato de diccionario. Proporciona métodos para obtener información sobre un banco específico o todos los bancos disponibles.
+```py
 import pyBCV
 
 bcv = pyBCV.Bank()
-
-get_bank = bcv.get_by_bank(bank_code='Banesco') # Devolvera un diccionario con los valores de compra y venta de moneda extranjera y su fecha valida.
-specific_bank = bcv.get_by_bank(bank_code='Banesco', rate_or_sale='Compra') # Decolvera el valor de compra de moneda extranjera.
+bank_info = bcv.get_by_bank() # obtener todas las tasas de cambio informativas de los bancos disponibles
+bnc_buy_rate = bcv.get_by_bank(bank_code='Banco Nacional de Crédito', rate_or_sale='Compra') # obtener la tasa de compra del Banco Nacional de Crédito
 ```
-
 ## Colaboradores
 
 | [<img src="https://avatars.githubusercontent.com/u/103836660?v=4" width=115><br><sub>Francisco Griman</sub>](https://github.com/fcoagz) |  [<img src="https://avatars.githubusercontent.com/u/12820150?v=4" width=115><br><sub>Jesús Alfredo Reyes Vargas</sub>](https://github.com/jesusareyesv) |
 | :---: | :---: |
 ## Propósito de pyBCV
-El objetivo principal de PyBCV es proporcionar una forma fácil y rápida de acceder a los datos de tipos de cambio y tasas informativas del BCV en un formato que sea fácil de usar y manipular en Python. 
+Esta librería está diseñada específicamente para recopilar y convertir estos datos en un formato fácilmente utilizable en Python, lo que permite a los desarrolladores acceder a ellos y utilizarlos en sus aplicaciones con facilidad. Con pyBCV, los usuarios pueden obtener información actualizada sobre las tasas de cambio y las tasas informativas de los bancos de manera rápida y sencilla, haciendo que el proceso de obtener estos datos sea más eficiente y conveniente.
