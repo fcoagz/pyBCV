@@ -10,7 +10,8 @@ def _get_rate_by_id(tag_id: str, soup: BeautifulSoup):
     return soup.find(id=tag_id).find("strong").text.strip().replace(',', '.')
 
 def _get_time(soup: BeautifulSoup):
-    return soup.find("span", "date-display-single").text.strip()
+    date = soup.find("span", "date-display-single")
+    return [date.text.strip().replace('  ', ' '), date.get("content").split('T')[0]]
 
 def _get_rates_with_for(soup: BeautifulSoup, name: str = "td", attrs: str = None):
     return [str(x.text).strip() for x in soup.find_all(name, attrs)]

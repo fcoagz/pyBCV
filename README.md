@@ -10,10 +10,6 @@ Para instalar esta librería, puedes utilizar el siguiente comando:
 ```py
 pip install pyBCV
 ```
-Para actualizar esta librería, puedes utilizar el siguiente comando:
-```py
-pip install pyBCV --upgrade
-```
 ## Uso
 La librería pyBCV proporciona dos clases, `Currency` y `Bank`, para obtener tasas de cambio e informativas de bancos del Banco Central de Venezuela.
 
