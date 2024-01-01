@@ -1,22 +1,32 @@
 [project]
 name = "pyBCV"
-version = "1.0.9"
+version = "1.1.0"
+dependencies = [
+  "requests",
+  "bs4",
+  "beautifulsoup4",
+  "babel"
+]
+requires-python = ">=3.9"
 authors = [
   { name="Francisco Griman", email="grihardware@gmail.com" }
 ]
 description = "PyBCV es una librería desarrollada en el lenguaje de programación Python que se utiliza para recopilar los precios de los tipos de cambio y las tasas informativas proporcionados por el Banco Central de Venezuela (BCV)."
 readme = "README.md"
-requires-python = ">=3.8"
+license = {file = "LICENSE"}
+keywords = [
+  "bcv",
+  "analysis",
+  "precios",
+  "tasascambio",
+  "divisas",
+  "pybcv",
+  "venezuela"
+]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-]
-keywords = ["bcv","analysis","precios","tasascambio","divisas","pybcv","venezuela"]
-dependencies = [
-  "requests",
-  "bs4",
-  "beautifulsoup4"
 ]
 
 [project.urls]

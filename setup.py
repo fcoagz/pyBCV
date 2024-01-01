@@ -3,7 +3,7 @@ from setuptools import find_packages, setup
 
 HERE = pathlib.Path(__file__).parent
 
-VERSION = '1.0.9'
+VERSION = '1.1.0'
 PACKAGE_NAME = 'pyBCV' 
 AUTHOR = 'Francisco Griman'
 AUTHOR_EMAIL = 'grihardware@gmail.com'
@@ -17,7 +17,8 @@ LONG_DESC_TYPE = "text/markdown"
 INSTALL_REQUIRES = [
       'requests',
       'bs4',
-      'beautifulsoup4'
+      'beautifulsoup4',
+      'babel'
       ]
 
 CLASSIFIERS = [
