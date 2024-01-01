@@ -1,5 +1,5 @@
- <p align="center">
- <img width="300" height="170" src="pyBCV/pybcv-preview.png">
+<p align="center">
+ <img width="300" height="170" src="https://github.com/fcoagz/pyBCV/blob/main/pyBCV/pybcv-preview.png?raw=true">
 </p>
 
 # pyBCV
@@ -15,21 +15,24 @@ La librería pyBCV proporciona dos clases, `Currency` y `Bank`, para obtener tas
 
 La clase `Currency` obtiene tasas de cambio para varias monedas y las devuelve en formato de diccionario. También proporciona métodos para obtener una tasa de cambio específica o la hora de la última actualización.
 ```py
-import pyBCV
+from pyBCV import Currency
 
-currency = pyBCV.Currency()
+currency = Currency()
 all_rates = currency.get_rate() # obtener todas las tasas de cambio de moneda
 usd_rate = currency.get_rate(currency_code='USD', prettify=False) # obtener la tasa de cambio del dólar estadounidense sin símbolo de moneda
 last_update = currency.get_rate(currency_code='Fecha') # obtener la hora de la última actualización
 ```
 
-La clase `Bank` obtiene tasas informativas proporcionadas por varios bancos en Venezuela y las devuelve en formato de diccionario. Proporciona métodos para obtener información sobre un banco específico o todos los bancos disponibles.
+La clase Bank obtiene tasas informativas proporcionadas por varios bancos en Venezuela y las devuelve en formato de lista de diccionarios. Proporciona métodos para obtener información sobre un banco específico o todos los bancos disponibles.
 ```py
-import pyBCV
+from pyBCV import Bank
 
-bcv = pyBCV.Bank()
-bank_info = bcv.get_by_bank() # obtener todas las tasas de cambio informativas de los bancos disponibles
-bnc_buy_rate = bcv.get_by_bank(bank_code='Banco Nacional de Crédito', rate_or_sale='Compra') # obtener la tasa de compra del Banco Nacional de Crédito
+bcv = Bank("01-01-2023", "31-12-2023") # Inicializar la clase Bank con fechas de inicio y final
+bank_info = bcv.get_by_bank() # Obtener todas las tasas de cambio informativas de los bancos disponibles
+
+# Obtener la tasa de cambio informativa del Banco Nacional de Crédito
+bnc_info = bcv.get_by_bank(bank_code='Banco Nacional de Crédito') 
+
 ```
 ## Colaboradores
 
