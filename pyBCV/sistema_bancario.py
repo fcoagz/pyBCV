@@ -1,3 +1,4 @@
+from typing import Union
 from bs4 import BeautifulSoup
 from datetime import datetime
 
@@ -52,7 +53,7 @@ class Bank:
             if self.start_date <= fecha <= self.final_date:
                 self.result.append({fecha_str: data[fecha_str]})
     
-    def get_by_bank(self, bank_code: str = None):
+    def get_by_bank(self, bank_code: str = None) -> Union[list, dict]:
         """
         Devuelve los tipos de cambio para un banco específico.
         """

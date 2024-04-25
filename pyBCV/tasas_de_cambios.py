@@ -1,3 +1,4 @@
+from typing import Union
 from bs4 import BeautifulSoup
 from babel import dates
 
@@ -33,7 +34,7 @@ class Currency:
         }
         self.rates['Fecha'] = _get_time(section_tipo_de_cambio_oficial)
 
-    def get_rate(self, currency_code: str = None, prettify: bool = False) -> dict[str, str] | str:
+    def get_rate(self, currency_code: str = None, prettify: bool = False) -> Union[dict[str, str], str]:
         """
         :currency_code: Especifica una tasa de cambio en especifico de obtener su valor. (`EUR`, `CNY`, `TRY`, `RUB`, `USD`, `Fecha`)
         :prettify: True si desea que el valor tenga el simbolo de la moneda en bolivares.
